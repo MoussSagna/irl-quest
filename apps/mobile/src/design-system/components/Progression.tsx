@@ -27,8 +27,8 @@ export function StreakBadge({ days }: { days: number }) {
   return <View accessibilityLabel={`${days} day streak`} style={styles.streak}><Text style={styles.streakIcon}>🔥</Text><View><Text style={styles.streakNumber}>{days}</Text><Text style={styles.streakCaption}>day streak</Text></View></View>;
 }
 
-export function AchievementBadge({ title, icon = '🏆', unlocked = true }: { title: string; icon?: string; unlocked?: boolean }) {
-  return <View accessibilityLabel={`${title}${unlocked ? ', unlocked' : ', locked'}`} style={[styles.achievement, !unlocked && styles.achievementLocked]}><Text style={styles.achievementIcon}>{unlocked ? icon : '🔒'}</Text><Text style={styles.achievementTitle}>{title}</Text></View>;
+export function AchievementBadge({ title, icon = '🏆', unlocked = true, rarity }: { title: string; icon?: string; unlocked?: boolean; rarity?: string }) {
+  return <View accessibilityLabel={`${title}${unlocked ? ', unlocked' : ', locked'}`} style={[styles.achievement, !unlocked && styles.achievementLocked]}><Text style={styles.achievementIcon}>{unlocked ? icon : '🔒'}</Text><Text style={styles.achievementTitle}>{title}</Text>{rarity && <Text style={styles.achievementRarity}>{rarity}</Text>}</View>;
 }
 
 export function Avatar({ initials, size = 48 }: { initials: string; size?: number }) {
@@ -47,6 +47,6 @@ const styles = StyleSheet.create({
   levelNumber: { color: colors.white, fontSize: 20, fontWeight: '800' },
   streak: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, backgroundColor: colors.amberSoft, borderRadius: radii.md, padding: spacing.md },
   streakIcon: { fontSize: 22 }, streakNumber: { color: colors.ink, fontSize: 18, fontWeight: '800' }, streakCaption: { color: colors.muted, ...typography.caption },
-  achievement: { alignItems: 'center', gap: 6, minWidth: 76 }, achievementLocked: { opacity: 0.45 }, achievementIcon: { fontSize: 28 }, achievementTitle: { color: colors.muted, ...typography.label, textAlign: 'center' },
+  achievement: { alignItems: 'center', gap: 6, minWidth: 76 }, achievementLocked: { opacity: 0.45 }, achievementIcon: { fontSize: 28 }, achievementTitle: { color: colors.muted, ...typography.label, textAlign: 'center' }, achievementRarity: { color: colors.achievement, ...typography.caption, textTransform: 'capitalize' },
   avatar: { alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primarySoft }, avatarText: { color: colors.primaryDark, fontWeight: '800' },
 });
