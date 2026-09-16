@@ -15,7 +15,7 @@ Mobile (Expo/RN) ───────┘                         │
                                                             └─> PostgreSQL/Neon
 ```
 
-Le Web et le Mobile partagent des packages TypeScript, mais l'interface Web métier n'est pas encore construite. Le Mobile utilise actuellement l'API partagée pour Better Auth et garde les données RPG dans des mocks locaux.
+Le Web et le Mobile partagent des packages TypeScript, mais l'interface Web métier n'est pas encore construite. Le Mobile utilise l'API partagée pour Better Auth et les Goals ; les autres données RPG restent locales/mockées.
 
 ## Monorepo
 
@@ -44,6 +44,7 @@ prisma/
 Responsabilités actuelles :
 
 - démarrer le serveur Node avec `@hono/node-server` ;
+- charger le `.env` racine avec `dotenv` avant toute validation de configuration ou initialisation Better Auth ;
 - exposer l'application Hono ;
 - valider les variables d'environnement via `envSchema` ;
 - monter `/api/auth/*` vers Better Auth ;
@@ -116,6 +117,8 @@ Expose la configuration partagée actuellement disponible, notamment le nom `IRL
 
 Better Auth est créé dans `apps/api/src/auth/config.ts` avec l'adaptateur Prisma PostgreSQL. Hono monte le handler sur `/api/auth/*`.
 
+`apps/api/src/load-env.ts` charge le fichier `.env` situé à la racine du monorepo. `app.ts` l'importe avant les modules d'authentification, afin que `BETTER_AUTH_SECRET`, `DATABASE_URL`, `BETTER_AUTH_URL` et `PORT` soient disponibles avant la validation Zod. Le fichier reste ignoré par Git.
+
 `requireAuth` appelle `auth.api.getSession` à partir des headers de la requête. Si aucune session n'est valide, l'API renvoie `401`. Sinon, la session est placée dans le contexte Hono et `/api/me` renvoie l'utilisateur issu de cette session.
 
 ### Mobile
@@ -129,7 +132,7 @@ AuthProvider / TanStack Mutation
   ↓
 packages/api-client
   ↓
-HTTP /api/auth/* ou /api/me
+HTTP /api/auth/*, /api/me ou /api/goals
   ↓
 Set-Cookie → Expo SecureStore
 ```
@@ -138,26 +141,35 @@ Le client ajoute ensuite le cookie stocké aux requêtes suivantes. `signOut` te
 
 ### URL API
 
-Le Mobile lit `EXPO_PUBLIC_API_URL`. Cette variable est publique par nature et ne doit contenir aucun secret :
+Le Mobile lit `EXPO_PUBLIC_API_URL`. Cette variable est publique par nature et ne doit contenir aucun secret. Elle est validée au démarrage :
+
+- une valeur absente ou malformée produit un message de configuration explicite au lieu d'un écran vide ;
+- une valeur attendue est une origine HTTP(S) complète ;
+- une valeur de type `EXPO_PUBLIC_API_URL=EXPO_PUBLIC_API_URL=http://...` est rejetée.
+
+Valeurs selon l'environnement :
 
 - iOS Simulator : généralement `http://localhost:8787` ;
 - Android Emulator : généralement `http://10.0.2.2:8787` ;
 - appareil physique : adresse IP locale du Mac et API accessible sur le réseau.
 
+Le serveur Node/Hono écoute explicitement sur `0.0.0.0` au port configuré afin d'accepter les connexions du réseau local. `BETTER_AUTH_SECRET` et `DATABASE_URL` restent exclusivement côté serveur.
+
 ## Database
 
-Prisma utilise PostgreSQL et `DATABASE_URL`. Le schéma actuel contient uniquement les modèles nécessaires à Better Auth :
+Prisma utilise PostgreSQL et `DATABASE_URL`. Le schéma actuel contient les modèles Better Auth et Goal :
 
 - `User`
 - `Session`
 - `Account`
 - `Verification`
+- `Goal` (propriété d'un `User`, protégé par `userId`)
 
-Les modèles RPG n'existent pas encore. La persistance des Goals, Quests, XP et Achievements est donc une étape future.
+Les modèles Quest, XP et Achievement n'existent pas encore.
 
 ## State management
 
-- TanStack Query : état serveur `/api/me` et mutations d'authentification.
+- TanStack Query : état serveur `/api/me`, Goals et mutations d'authentification/Goals.
 - React Context : `AuthProvider` et `QuestProvider`.
 - `QuestProvider` : état local temporaire pour la complétion et l'XP des quêtes mockées.
 - Zustand : non installé, donc aucune architecture Zustand à maintenir.

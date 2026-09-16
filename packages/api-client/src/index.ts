@@ -7,6 +7,25 @@ export type SessionUser = {
   image?: string | null;
 };
 
+export type Goal = {
+  id: string;
+  userId: string;
+  title: string;
+  description: string;
+  category: string;
+  target: number;
+  progress: number;
+  unit: string;
+  status: 'active' | 'completed' | 'paused';
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type GoalInput = Omit<Pick<Goal, 'title' | 'description' | 'category' | 'target' | 'progress' | 'unit' | 'status'>, 'progress' | 'status'> & {
+  progress?: number;
+  status?: Goal['status'];
+};
+
 export type CookieStorage = {
   get: () => Promise<string | null>;
   set: (cookie: string) => Promise<void>;
@@ -32,7 +51,9 @@ const readError = async (response: Response) => {
 export const createApiClient = (baseUrl: string, cookies?: CookieStorage) => {
   const request = async <T>(path: string, init: RequestInit = {}): Promise<T> => {
     const headers = new Headers(init.headers);
-    headers.set('content-type', 'application/json');
+    if (init.body !== undefined && !headers.has('content-type')) {
+      headers.set('content-type', 'application/json');
+    }
     const cookie = await cookies?.get();
     if (cookie) headers.set('cookie', cookie);
 
@@ -54,6 +75,17 @@ export const createApiClient = (baseUrl: string, cookies?: CookieStorage) => {
       method: 'POST',
       body: JSON.stringify({ name, email, password }),
     }),
+    goals: () => request<{ goals: Goal[] }>('/api/goals'),
+    goal: (id: string) => request<{ goal: Goal }>(`/api/goals/${id}`),
+    createGoal: (input: GoalInput) => request<{ goal: Goal }>('/api/goals', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }),
+    updateGoal: (id: string, input: Partial<GoalInput>) => request<{ goal: Goal }>(`/api/goals/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    }),
+    deleteGoal: (id: string) => request<void>(`/api/goals/${id}`, { method: 'DELETE' }),
     signOut: async () => {
       try {
         await request('/api/auth/sign-out', { method: 'POST' });
