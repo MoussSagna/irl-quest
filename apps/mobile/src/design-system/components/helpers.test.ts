@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest';
 import { clampProgress, questStatusLabel } from './helpers';
 
 describe('progression helpers', () => {
