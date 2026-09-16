@@ -4,6 +4,8 @@ Historique des principales étapes réellement présentes dans l'historique Git 
 
 ## 2026-09-16 — Logout et Goals persistants
 
+Commits : `42f5ebc`, `54fd171`
+
 - Correction du client API : les requêtes sans corps, notamment `POST /api/auth/sign-out`, n'annoncent plus un JSON vide à Better Auth.
 - Ajout du modèle Prisma `Goal` et de sa migration PostgreSQL.
 - Ajout des schémas Zod et des routes protégées `GET/POST/PATCH/DELETE /api/goals`.
