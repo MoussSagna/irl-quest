@@ -33,6 +33,15 @@ describe('QuestCard', () => {
     expect(screen.getByText('✓ Completed')).toBeTruthy();
     expect(screen.queryByText('Start quest')).toBeNull();
   });
+
+  it('offers a completion action for an in-progress quest', () => {
+    const onComplete = jest.fn();
+    const screen = render(<QuestCard quest={{ ...quest, status: 'in-progress', progress: 0.6 }} onComplete={onComplete} />);
+
+    fireEvent.press(screen.getByRole('button', { name: 'Complete quest' }));
+
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('GoalCard', () => {

@@ -1,5 +1,65 @@
 import type { HealthResponse } from '@irl-quest/types';
 
-export const createApiClient = (baseUrl: string) => ({
-  health: async (): Promise<HealthResponse> => (await fetch(`${baseUrl}/health`)).json(),
-});
+export type SessionUser = {
+  id: string;
+  name: string;
+  email: string;
+  image?: string | null;
+};
+
+export type CookieStorage = {
+  get: () => Promise<string | null>;
+  set: (cookie: string) => Promise<void>;
+  clear: () => Promise<void>;
+};
+
+export class ApiError extends Error {
+  constructor(public readonly status: number, message: string) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+const readError = async (response: Response) => {
+  try {
+    const body = await response.json() as { message?: string; error?: string };
+    return body.message ?? body.error ?? 'Something went wrong. Please try again.';
+  } catch {
+    return 'Something went wrong. Please try again.';
+  }
+};
+
+export const createApiClient = (baseUrl: string, cookies?: CookieStorage) => {
+  const request = async <T>(path: string, init: RequestInit = {}): Promise<T> => {
+    const headers = new Headers(init.headers);
+    headers.set('content-type', 'application/json');
+    const cookie = await cookies?.get();
+    if (cookie) headers.set('cookie', cookie);
+
+    const response = await fetch(`${baseUrl.replace(/\/$/, '')}${path}`, { ...init, headers });
+    const setCookie = response.headers.get('set-cookie');
+    if (setCookie) await cookies?.set(setCookie.split(';')[0]);
+    if (!response.ok) throw new ApiError(response.status, await readError(response));
+    return response.status === 204 ? undefined as T : response.json() as Promise<T>;
+  };
+
+  return {
+    health: () => request<HealthResponse>('/health'),
+    me: () => request<{ user: SessionUser }>('/api/me'),
+    signIn: (email: string, password: string) => request<{ user: SessionUser }>('/api/auth/sign-in/email', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    }),
+    signUp: (name: string, email: string, password: string) => request<{ user: SessionUser }>('/api/auth/sign-up/email', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, password }),
+    }),
+    signOut: async () => {
+      try {
+        await request('/api/auth/sign-out', { method: 'POST' });
+      } finally {
+        await cookies?.clear();
+      }
+    },
+  };
+};

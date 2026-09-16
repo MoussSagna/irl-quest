@@ -19,7 +19,7 @@ export type Quest = {
   icon?: string;
 };
 
-export function QuestCard({ quest, onPress }: { quest: Quest; onPress?: () => void }) {
+export function QuestCard({ quest, onPress, onComplete }: { quest: Quest; onPress?: () => void; onComplete?: () => void }) {
   const locked = quest.status === 'locked';
   const statusLabel = questStatusLabel(quest.status);
   const content = <Card style={[styles.card, locked && styles.locked]}>
@@ -32,6 +32,7 @@ export function QuestCard({ quest, onPress }: { quest: Quest; onPress?: () => vo
     </View>
     {quest.status === 'in-progress' && <View style={styles.progress}><ProgressBar value={clampProgress(quest.progress ?? 0)} color={colors.primary} /><Text style={styles.progressText}>{Math.round(clampProgress(quest.progress ?? 0) * 100)}%</Text></View>}
     {quest.status === 'available' && <Button label="Start quest" onPress={onPress} style={styles.action} />}
+    {quest.status === 'in-progress' && <Button label="Complete quest" onPress={onComplete} style={styles.action} />}
     {quest.status === 'completed' && <Text style={styles.complete}>✓ Completed</Text>}
     {quest.status === 'failed' && <Text style={styles.failed}>Try again tomorrow</Text>}
   </Card>;
