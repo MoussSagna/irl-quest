@@ -42,8 +42,27 @@ export function BottomNavigation({ state, descriptors, navigation, insets = { bo
 }
 
 const styles = StyleSheet.create({
-  bar: { flexDirection: 'row', backgroundColor: colors.surface, borderTopWidth: 1, borderTopColor: colors.border, paddingHorizontal: spacing.sm, paddingTop: spacing.sm, shadowColor: colors.white, shadowOffset: { width: 0, height: -4 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 12 },
-  item: { flex: 1, minHeight: 56, alignItems: 'center', justifyContent: 'center', borderRadius: radii.lg },
+  bar: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  backgroundColor: colors.surface,
+  borderTopWidth: 1,
+  borderTopColor: colors.border,
+  paddingHorizontal: spacing.xxl,
+  paddingTop: spacing.sm,
+  shadowColor: colors.white,
+  shadowOffset: { width: 0, height: -4 },
+  shadowOpacity: 0.08,
+  shadowRadius: 12,
+  elevation: 12,
+},
+item: {
+  minHeight: 56,
+  width: 56,
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: radii.lg,
+},
   active: { backgroundColor: colors.primarySoft },
   iconWrap: { width: 48, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: radii.md },
   activeIconWrap: { backgroundColor: colors.surfaceMuted },
