@@ -44,6 +44,7 @@ prisma/
 Responsabilités actuelles :
 
 - démarrer le serveur Node avec `@hono/node-server` ;
+- charger le `.env` racine avec `dotenv` avant toute validation de configuration ou initialisation Better Auth ;
 - exposer l'application Hono ;
 - valider les variables d'environnement via `envSchema` ;
 - monter `/api/auth/*` vers Better Auth ;
@@ -115,6 +116,8 @@ Expose la configuration partagée actuellement disponible, notamment le nom `IRL
 ### API
 
 Better Auth est créé dans `apps/api/src/auth/config.ts` avec l'adaptateur Prisma PostgreSQL. Hono monte le handler sur `/api/auth/*`.
+
+`apps/api/src/load-env.ts` charge le fichier `.env` situé à la racine du monorepo. `app.ts` l'importe avant les modules d'authentification, afin que `BETTER_AUTH_SECRET`, `DATABASE_URL`, `BETTER_AUTH_URL` et `PORT` soient disponibles avant la validation Zod. Le fichier reste ignoré par Git.
 
 `requireAuth` appelle `auth.api.getSession` à partir des headers de la requête. Si aucune session n'est valide, l'API renvoie `401`. Sinon, la session est placée dans le contexte Hono et `/api/me` renvoie l'utilisateur issu de cette session.
 

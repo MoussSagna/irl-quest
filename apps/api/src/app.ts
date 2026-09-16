@@ -1,3 +1,4 @@
+import './load-env.js';
 import { Hono } from 'hono';
 import { envSchema } from '@irl-quest/validation';
 import type { HealthResponse } from '@irl-quest/types';

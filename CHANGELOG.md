@@ -2,6 +2,12 @@
 
 Historique des principales étapes réellement présentes dans l'historique Git d'IRL Quest.
 
+## 2026-09-16 — Chargement de l'environnement API
+
+- Ajout d'un loader `dotenv` explicite pour charger le `.env` racine avant l'initialisation de Better Auth.
+- Le script `pnpm --filter @irl-quest/api dev` conserve la validation Zod stricte sans valeur secrète par défaut.
+- Les tests API utilisent le même chargement d'environnement local.
+
 ## 2026-09-16 — Logout et Goals persistants
 
 Commits : `42f5ebc`, `54fd171`

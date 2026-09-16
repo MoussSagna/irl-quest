@@ -1,3 +1,5 @@
+import '../src/load-env.js';
+
 process.env.BETTER_AUTH_URL ??= 'http://localhost:8787';
 
 if (!process.env.BETTER_AUTH_SECRET) {

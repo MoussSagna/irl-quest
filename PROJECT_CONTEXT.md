@@ -67,6 +67,7 @@ L'application Web contient actuellement le shell Vite et ses fichiers de configu
 - Zod via `@irl-quest/validation`
 - Better Auth `1.7.5`
 - Vitest `3.0.0` pour les tests API
+- Le script API charge explicitement le `.env` racine avec `dotenv` avant d'importer Hono et Better Auth.
 
 ### Database
 
@@ -99,6 +100,8 @@ L'application Web contient actuellement le shell Vite et ses fichiers de configu
 ### Deployment
 
 Aucune configuration de déploiement, CI/CD, hébergeur ou workflow GitHub Actions n'a été détectée dans le repository actuel. Les scripts disponibles sont locaux : développement, build, lint, typecheck, test et export Web mobile.
+
+Le repository ne déclare actuellement pas de version Node via `.nvmrc`, `.node-version`, `mise.toml`, Volta ou `engines`. La version utilisée lors de cette vérification est Node.js 24.14.0.
 
 ## 4. Monorepo réel
 
