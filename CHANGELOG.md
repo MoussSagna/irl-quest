@@ -2,6 +2,15 @@
 
 Historique des principales étapes réellement présentes dans l'historique Git d'IRL Quest.
 
+## 2026-09-16 — Logout et Goals persistants
+
+- Correction du client API : les requêtes sans corps, notamment `POST /api/auth/sign-out`, n'annoncent plus un JSON vide à Better Auth.
+- Ajout du modèle Prisma `Goal` et de sa migration PostgreSQL.
+- Ajout des schémas Zod et des routes protégées `GET/POST/PATCH/DELETE /api/goals`.
+- L'identité et l'isolation des Goals proviennent exclusivement de la session serveur.
+- Ajout du client API Goals, des hooks TanStack Query et de l'écran mobile avec états loading/error/empty et création.
+- Ajout des tests d'intégration API et des tests mobiles Goals.
+
 ## 2026-09-16 — Correction de la connectivité API mobile
 
 - Correction de la configuration locale `EXPO_PUBLIC_API_URL` malformée.

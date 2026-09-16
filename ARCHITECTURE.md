@@ -15,7 +15,7 @@ Mobile (Expo/RN) ───────┘                         │
                                                             └─> PostgreSQL/Neon
 ```
 
-Le Web et le Mobile partagent des packages TypeScript, mais l'interface Web métier n'est pas encore construite. Le Mobile utilise actuellement l'API partagée pour Better Auth et garde les données RPG dans des mocks locaux.
+Le Web et le Mobile partagent des packages TypeScript, mais l'interface Web métier n'est pas encore construite. Le Mobile utilise l'API partagée pour Better Auth et les Goals ; les autres données RPG restent locales/mockées.
 
 ## Monorepo
 
@@ -129,7 +129,7 @@ AuthProvider / TanStack Mutation
   ↓
 packages/api-client
   ↓
-HTTP /api/auth/* ou /api/me
+HTTP /api/auth/*, /api/me ou /api/goals
   ↓
 Set-Cookie → Expo SecureStore
 ```
@@ -154,18 +154,19 @@ Le serveur Node/Hono écoute explicitement sur `0.0.0.0` au port configuré afin
 
 ## Database
 
-Prisma utilise PostgreSQL et `DATABASE_URL`. Le schéma actuel contient uniquement les modèles nécessaires à Better Auth :
+Prisma utilise PostgreSQL et `DATABASE_URL`. Le schéma actuel contient les modèles Better Auth et Goal :
 
 - `User`
 - `Session`
 - `Account`
 - `Verification`
+- `Goal` (propriété d'un `User`, protégé par `userId`)
 
-Les modèles RPG n'existent pas encore. La persistance des Goals, Quests, XP et Achievements est donc une étape future.
+Les modèles Quest, XP et Achievement n'existent pas encore.
 
 ## State management
 
-- TanStack Query : état serveur `/api/me` et mutations d'authentification.
+- TanStack Query : état serveur `/api/me`, Goals et mutations d'authentification/Goals.
 - React Context : `AuthProvider` et `QuestProvider`.
 - `QuestProvider` : état local temporaire pour la complétion et l'XP des quêtes mockées.
 - Zustand : non installé, donc aucune architecture Zustand à maintenir.

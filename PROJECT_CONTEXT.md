@@ -152,6 +152,8 @@ Les routes explicitement validées par les tests sont :
 - `POST /api/auth/sign-in/email`
 - `POST /api/auth/sign-out` utilisé par le client mobile
 
+Le client HTTP n'ajoute `Content-Type: application/json` que lorsqu'un corps est présent. Cela permet au logout Better Auth d'envoyer un `POST` sans corps JSON invalide.
+
 `GET /api/me` est protégé par `requireAuth`, lit la session depuis les headers et renvoie l'utilisateur authentifié. L'identité ne vient pas d'un `userId` fourni par le client.
 
 ### Mobile
@@ -193,13 +195,15 @@ Modèles réellement présents :
 - `Session`
 - `Account`
 - `Verification`
+- `Goal` relié à `User` par `userId`, avec titre, description, catégorie, cible, progression, unité, statut et timestamps.
 
-Ces modèles servent à Better Auth. Aucun modèle `Goal`, `Quest`, `Achievement`, `XP` ou autre modèle RPG persistant n'existe encore dans `prisma/schema.prisma`.
+Ces modèles servent à Better Auth. Les modèles `Quest`, `Achievement`, `XP` et les statistiques RPG persistantes n'existent pas encore.
 
 Migration réellement présente :
 
 ```text
 prisma/migrations/20260916140000_add_better_auth/migration.sql
+prisma/migrations/20260916220000_add_goals/migration.sql
 ```
 
 Elle crée les quatre modèles Better Auth, leurs index et leurs relations.
@@ -248,7 +252,7 @@ Le design system se trouve sous `apps/mobile/src/design-system` :
 
 ### Données et état
 
-`features/shared/mockData.ts` centralise les données fictives de player, quests, goals et achievements.
+Les Goals sont chargés depuis `GET /api/goals` avec TanStack Query dans `features/goals/useGoals.ts`. L'écran gère le chargement, l'erreur, le retry, l'état vide et la création. Les autres données RPG restent centralisées dans `features/shared/mockData.ts`.
 
 `features/quests/QuestProvider.tsx` simule la complétion d'une quête et l'augmentation d'XP. Ces données ne sont pas encore synchronisées avec l'API ou la base de données.
 
@@ -275,9 +279,9 @@ cd apps/mobile
 
 Dernière vérification connue après l'intégration Better Auth :
 
-- 10 suites ;
-- 30 tests ;
-- 30 réussis ;
+- 12 suites ;
+- 34 tests ;
+- 34 réussis lors de la dernière exécution ;
 - couverture : 79,67 % statements, 81,28 % branches, 73,97 % functions, 88,57 % lines.
 
 ## 9. Design
@@ -326,6 +330,7 @@ Convention : Conventional Commits en anglais, commits atomiques. Les derniers co
 - Route protégée `/api/me`.
 - Client API partagé avec gestion d'erreurs et cookies.
 - Authentification mobile Login/Register, session SecureStore et logout.
+- Goals persistants : CRUD API protégé par session, validation Zod, migration Prisma et affichage/création mobile.
 - Garde de navigation authentifiée/non authentifiée.
 - Fondation du design system mobile Midnight Progression.
 - Navigation RPG mobile à cinq destinations.
@@ -337,7 +342,7 @@ Convention : Conventional Commits en anglais, commits atomiques. Les derniers co
 
 ## 12. Fonctionnalités en cours ou non persistées
 
-- Les Goals, Quests, Achievements, XP et statistiques RPG restent des données mockées côté mobile.
+- Les Quests, Achievements, XP et statistiques RPG restent des données mockées côté mobile.
 - La synchronisation entre API, base, Web et Mobile n'est pas encore implémentée.
 - L'application Web n'a pas encore d'interface métier.
 - Le Game Master IA/OpenAI n'est pas implémenté.
@@ -345,8 +350,8 @@ Convention : Conventional Commits en anglais, commits atomiques. Les derniers co
 ## 13. Prochaines étapes réalistes
 
 1. Vérifier le parcours Better Auth réel sur iOS Simulator, Android Emulator et appareil physique.
-2. Ajouter des schémas Zod partagés et des routes API pour les objectifs et quêtes.
-3. Ajouter les modèles Prisma RPG et leurs migrations.
+2. Ajouter la persistance des Quests et leur progression.
+3. Ajouter les modèles Prisma RPG restants et leurs migrations.
 4. Remplacer progressivement `mockData` et `QuestProvider` par TanStack Query et API protégée.
 5. Construire l'interface Web avec les types et le client partagés.
 6. Ajouter la gestion robuste des sessions expirées et des erreurs réseau.

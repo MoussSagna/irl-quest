@@ -6,6 +6,26 @@ import GoalsScreen from './goals/GoalsScreen';
 import AchievementsScreen from './achievements/AchievementsScreen';
 import ProfileScreen from './profile/ProfileScreen';
 
+jest.mock('./goals/useGoals', () => ({
+  useGoals: () => ({
+    data: [{
+      id: 'move',
+      title: 'Move your body',
+      description: 'Keep your energy flowing',
+      category: 'Fitness',
+      progress: 3,
+      target: 5,
+      unit: 'days',
+      status: 'active',
+    }],
+    isLoading: false,
+    isError: false,
+    error: null,
+    refetch: jest.fn(),
+    create: { isPending: false, mutateAsync: jest.fn() },
+  }),
+}));
+
 jest.mock('./auth/AuthProvider', () => ({
   AuthProvider: ({ children }: { children: React.ReactNode }) => children,
   useAuth: () => ({ user: null, signOut: jest.fn() }),
@@ -32,7 +52,7 @@ describe('mobile feature screens', () => {
   it('renders goals and their next steps', () => {
     const screen = withProvider(<GoalsScreen />);
     expect(screen.getByText('Goals')).toBeTruthy();
-    expect(screen.getByText('Next: Complete a 20-minute walk')).toBeTruthy();
+    expect(screen.getByText('Next: Continue your fitness journey')).toBeTruthy();
   });
 
   it('renders unlocked and locked achievement rarities', () => {
