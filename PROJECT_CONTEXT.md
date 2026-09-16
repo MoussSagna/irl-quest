@@ -2,7 +2,7 @@
 
 Dernière vérification : 16 septembre 2026
 Branche vérifiée : `feature/mobile-app`
-Dernier commit vérifié : `1766011 feat(mobile): integrate better auth`
+Dernier commit vérifié : `e9c10c0 docs: add persistent project context` (avant cette correction réseau)
 
 Ce document décrit l'état réellement présent dans le repository. Il doit être relu avant toute intervention importante et corrigé lorsque le code évolue.
 
@@ -360,12 +360,16 @@ Convention : Conventional Commits en anglais, commits atomiques. Les derniers co
 - Les données serveur doivent utiliser TanStack Query ; Zustand n'est pas nécessaire tant qu'aucun état client global ne le justifie.
 - Les types et validations réutilisables doivent vivre dans les packages partagés.
 - Les sessions mobiles utilisent SecureStore pour le cookie, jamais un mot de passe.
+- Sur un appareil physique, `EXPO_PUBLIC_API_URL` doit utiliser l'origine LAN de l'API, jamais `localhost`.
+- Le serveur API de développement écoute sur `0.0.0.0` pour être joignable par un appareil du même réseau.
 - Les données RPG mockées restent centralisées jusqu'à la disponibilité des routes et modèles persistants.
 - Les changements doivent rester modulaires et testables.
 
 ## 15. Problèmes connus
 
-- L'adresse `EXPO_PUBLIC_API_URL` doit être adaptée au contexte réseau : localhost, émulateur Android ou appareil physique.
+- L'adresse `EXPO_PUBLIC_API_URL` doit être adaptée au contexte réseau : localhost pour le simulateur iOS, `10.0.2.2` pour l'émulateur Android, ou `http://<MAC_LAN_IP>:8787` pour un appareil physique.
+- Une déclaration Expo malformée comme `EXPO_PUBLIC_API_URL=EXPO_PUBLIC_API_URL=http://...` est invalide et peut empêcher le démarrage utile de l'application ; l'application affiche maintenant une erreur de configuration explicite.
+- Le serveur API doit être démarré avec une écoute réseau (`0.0.0.0`) pour les appareils physiques.
 - Le parcours mobile réel contre une API distante n'a pas été validé dans ce workspace.
 - L'export Web affiche un avertissement NativeWind indiquant qu'aucune classe utilitaire n'a été détectée ; l'export reste réussi.
 - Aucun pipeline de déploiement ou CI n'est présent dans le repository.

@@ -138,11 +138,19 @@ Le client ajoute ensuite le cookie stocké aux requêtes suivantes. `signOut` te
 
 ### URL API
 
-Le Mobile lit `EXPO_PUBLIC_API_URL`. Cette variable est publique par nature et ne doit contenir aucun secret :
+Le Mobile lit `EXPO_PUBLIC_API_URL`. Cette variable est publique par nature et ne doit contenir aucun secret. Elle est validée au démarrage :
+
+- une valeur absente ou malformée produit un message de configuration explicite au lieu d'un écran vide ;
+- une valeur attendue est une origine HTTP(S) complète ;
+- une valeur de type `EXPO_PUBLIC_API_URL=EXPO_PUBLIC_API_URL=http://...` est rejetée.
+
+Valeurs selon l'environnement :
 
 - iOS Simulator : généralement `http://localhost:8787` ;
 - Android Emulator : généralement `http://10.0.2.2:8787` ;
 - appareil physique : adresse IP locale du Mac et API accessible sur le réseau.
+
+Le serveur Node/Hono écoute explicitement sur `0.0.0.0` au port configuré afin d'accepter les connexions du réseau local. `BETTER_AUTH_SECRET` et `DATABASE_URL` restent exclusivement côté serveur.
 
 ## Database
 

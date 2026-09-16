@@ -2,6 +2,14 @@
 
 Historique des principales étapes réellement présentes dans l'historique Git d'IRL Quest.
 
+## 2026-09-16 — Correction de la connectivité API mobile
+
+- Correction de la configuration locale `EXPO_PUBLIC_API_URL` malformée.
+- Validation explicite de l'origine API mobile et écran d'erreur lisible en cas de variable absente ou invalide.
+- Configuration du serveur API pour écouter sur `0.0.0.0`.
+- Ajout de tests pour la configuration réseau mobile.
+- Vérification de `401 Unauthorized` sur localhost et sur l'adresse LAN, sans session.
+
 ## 2026-09-16 — Intégration Better Auth mobile
 
 Commit : `1766011 feat(mobile): integrate better auth`

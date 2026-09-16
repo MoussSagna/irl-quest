@@ -1,7 +1,8 @@
 import React, { PropsWithChildren, createContext, useContext, useMemo, useState } from 'react';
 import { QueryClient, QueryClientProvider, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { SessionUser } from '@irl-quest/api-client';
-import { apiClient } from './api';
+import { apiClient, apiConfiguration } from './api';
+import { ApiConfigurationError } from './config';
 
 type AuthContextValue = {
   user: SessionUser | null;
@@ -11,6 +12,7 @@ type AuthContextValue = {
   signUp: (name: string, email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   error: Error | null;
+  configurationError: ApiConfigurationError | null;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -26,7 +28,10 @@ function AuthState({ children }: PropsWithChildren) {
   const [actionError, setActionError] = useState<Error | null>(null);
   const currentUser = useQuery({
     queryKey: ['auth', 'me'],
-    queryFn: async () => (await apiClient.me()).user,
+    queryFn: async () => {
+      if (apiConfiguration.error) throw apiConfiguration.error;
+      return (await apiClient.me()).user;
+    },
   });
   const signInMutation = useMutation({
     mutationFn: ({ email, password }: { email: string; password: string }) => apiClient.signIn(email, password),
@@ -58,6 +63,7 @@ function AuthState({ children }: PropsWithChildren) {
       try { await signOutMutation.mutateAsync(); } catch (error) { setActionError(error as Error); throw error; }
     },
     error: actionError ?? (currentUser.error as Error | null),
+    configurationError: currentUser.error instanceof ApiConfigurationError ? currentUser.error : null,
   }), [actionError, currentUser.data, currentUser.error, currentUser.isLoading, signInMutation, signOutMutation, signUpMutation]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
