@@ -1,0 +1,1 @@
+{"name":"@irl-quest/api-client","private":true,"version":"0.0.0","type":"module","exports":{".":"./src/index.ts"},"scripts":{"typecheck":"tsc --noEmit"},"dependencies":{"@irl-quest/types":"workspace:*"},"devDependencies":{"typescript":"^5.7.3"}}
