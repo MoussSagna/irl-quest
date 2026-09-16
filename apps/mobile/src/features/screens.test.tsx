@@ -6,6 +6,11 @@ import GoalsScreen from './goals/GoalsScreen';
 import AchievementsScreen from './achievements/AchievementsScreen';
 import ProfileScreen from './profile/ProfileScreen';
 
+jest.mock('./auth/AuthProvider', () => ({
+  AuthProvider: ({ children }: { children: React.ReactNode }) => children,
+  useAuth: () => ({ user: null, signOut: jest.fn() }),
+}));
+
 function withProvider(element: React.ReactElement) {
   return render(<QuestProvider>{element}</QuestProvider>);
 }
